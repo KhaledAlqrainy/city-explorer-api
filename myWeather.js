@@ -1,6 +1,7 @@
 'use strict';
 const axios = require('axios')
 
+let myMemory={};
 
 
 async function getWeather(req, res) {
@@ -9,7 +10,14 @@ async function getWeather(req, res) {
         const lon = req.query.lon;
         const lat = req.query.lat;
         const city_name = req.query.city_name;
-    
+
+        if (myMemory[city_name] !== undefined) 
+        {
+            
+            res.send(myMemory[city_name]);
+        }
+
+        else {
         let getweather = weatherdata.find(i => i.city_name.toLowerCase() === city_name.toLowerCase() || (i.lat === lat && i.lon === lon) 
         )
         
@@ -19,14 +27,17 @@ async function getWeather(req, res) {
         let myweather = getweather.data.map(i => new Forecast(i));
     
         res.send(myweather);
+        }
     }
 
     catch {}
 
-    
+
     
 
+
 }
+
 
 class Forecast {
     constructor (day) {
