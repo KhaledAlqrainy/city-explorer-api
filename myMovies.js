@@ -1,11 +1,16 @@
 'use strict';
 
 const axios=require('axios')
-
+let myMemory={};
 
 async function getMovies(req, res) {
     let returnArr = [];
     let { cityName } = req.query;
+
+    if(myMemory[city_name] !== undefined){
+
+        res.send(myMemory[city_name])
+    } else { 
     const URL = `https://api.themoviedb.org/3/search/movie?api_key=mSjXydZRVkSuJXcfMURFNgfcSKMmSEANpAKgBdcJgvc&query=${cityName}`;
 
     try {
@@ -18,6 +23,7 @@ async function getMovies(req, res) {
         res.status(400)
         if (error.status) res.status(error.status).send(error.message)
     }
+}
 }
 
 
