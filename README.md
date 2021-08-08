@@ -19,3 +19,16 @@ we are using Javascript, React and Node.js
 
 ## Credit and Collaborations
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
+
+# Time Estimates
+
+
+Name of feature: refactor
+
+Estimate of time needed to complete: one hour
+
+Start time: 4:00
+
+Finish time: 4:30
+
+Actual time needed to complete: 30 mins
