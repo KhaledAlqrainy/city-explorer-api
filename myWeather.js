@@ -3,10 +3,25 @@ const axios = require('axios')
 
 let myMemory={};
 
+class Forecast {
+    constructor(day) {
+        this.date = day.datetime;
+        this.description = day.weather.description;
+    }
+}
 
 async function getWeather(req, res) {
-    try{
 
+    try {
+        let { searchQuery, lat, lon } = req.query;
+        if (!searchQuery) searchQuery = "doesn't match any city"
+        const URL = `https://api.weatherbit.io/v2.0//forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${lat}&lon=${lon}`
+        let axiosWeather = await axios.get(URL)
+        let forecastArr = axiosWeather.data.data.map(info => new Forecast(info));
+        res.send(forecastArr);
+    }
+    catch (e) {
+        res.status(e.status).send({ status: e.status, description: `Error ${e.message}` });
         const lon = req.query.lon;
         const lat = req.query.lat;
         const city_name = req.query.city_name;
@@ -44,8 +59,7 @@ class Forecast {
         this.datetime = day.datetime;
         this.description = day.weather.description
     }
+};
 
-    
-}
 
 module.exports=getWeather;
