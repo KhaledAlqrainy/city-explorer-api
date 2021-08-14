@@ -1,15 +1,20 @@
+
 'use strict'
 
 const express = require('express');
+const getMovies =require('./myMovies');
+const getWeather = require('./myWeather');
+
+
+const express = require ('express');
 const server = express();
+
+const weatherData = require('./weather.json');
 
 require('dotenv').config();
 const PORT = process.env.PORT
 
 const cors = require('cors');
-server.use(cors());
-
-const axios = require('axios');
 
 class Forecast {
     constructor(day) {
@@ -66,4 +71,8 @@ async function getMovies(req, res) {
         if (error.status) res.status(error.status).send(error.message)
     }
 }
+        this.description = day.weather.description;
+    }
+}
+
 server.listen(PORT, () => console.log(`listening on ${PORT}`));
