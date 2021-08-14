@@ -1,7 +1,7 @@
 'use strict';
 
 const axios=require('axios')
-
+let myMemory={};
 
 class Movie {
     constructor(movie) {
@@ -19,6 +19,12 @@ async function getMovies(req, res) {
     let { cityName } = req.query;
     const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${cityName}`;
 
+    if(myMemory[city_name] !== undefined){
+
+        res.send(myMemory[city_name])
+    } else { 
+    const URL = `https://api.themoviedb.org/3/search/movie?api_key=mSjXydZRVkSuJXcfMURFNgfcSKMmSEANpAKgBdcJgvc&query=${cityName}`;
+
     try {
         let axiosMovies = await axios.get(URL)
         console.log(axiosMovies.data.results);
@@ -29,6 +35,7 @@ async function getMovies(req, res) {
         res.status(400)
         if (error.status) res.status(error.status).send(error.message)
     }
+}
 }
 
 
