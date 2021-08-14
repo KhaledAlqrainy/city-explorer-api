@@ -1,4 +1,3 @@
-
 'use strict'
 
 const express = require('express');
@@ -15,7 +14,7 @@ const axios = require('axios');
 class Forecast {
     constructor(day) {
         this.date = day.datetime;
-        this.description = day.weather.description;
+        this.description = `Low of ${day.low_temp}, high of ${day.high_temp} with ${day.weather.description}}`;
     }
 }
 class Movie {
@@ -40,7 +39,7 @@ async function getWeather(req, res) {
     try {
         let { searchQuery, lat, lon } = req.query;
         if (!searchQuery) searchQuery = "doesn't match any city"
-        const URL = `https://api.weatherbit.io/v2.0//forecast/daily?key=b1e043fdf8e9499f970885461a077df5&lat=${lat}&lon=${lon}`
+        const URL = `https://api.weatherbit.io/v2.0//forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${lat}&lon=${lon}`
         let axiosWeather = await axios.get(URL)
         let forecastArr = axiosWeather.data.data.map(info => new Forecast(info));
         // console.log(forecastArr);
@@ -54,7 +53,7 @@ async function getWeather(req, res) {
 async function getMovies(req, res) {
     let returnArr = [];
     let { cityName } = req.query;
-    const URL = `https://api.themoviedb.org/3/movie/550?api_key=749d0a27c7aa89303b2fecaf56391905&query=${cityName}`;
+    const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${cityName}`;
 
     try {
         let axiosMovies = await axios.get(URL)
