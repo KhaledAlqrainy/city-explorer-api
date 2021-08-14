@@ -19,104 +19,60 @@ const cors = require('cors');
 class Forecast {
     constructor(day) {
         this.date = day.datetime;
-        this.description = day.weather.description;
+        this.description = `Low of ${day.low_temp}, high of ${day.high_temp} with ${day.weather.description}}`;
+    }
+}
+class Movie {
+    constructor(movie) {
+        this.title = movie.title
+        this.overview = movie.overview
+        this.vote_average = movie.vote_average
+        this.vote_count = movie.vote_count
+        this.poster_path = `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        this.popularity = movie.popularity
+        this.release_date = movie.release_date
     }
 }
 
-server.get('/', (req, res) => {
-    res.send('Hello from main route');
-});
-server.get('/weather', (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
+server.get('/', (req, res) => { res.send('Hello from main route'); });
+
+server.get('/weather', getWeather)
+server.get('/movies', getMovies)
+
+async function getWeather(req, res) {
 
     try {
         let { searchQuery, lat, lon } = req.query;
-        let cityInfo = weatherData.find(element =>
-            element.city_name.toLowerCase() === searchQuery.toLowerCase() ||
-            (element.lat === lat && element.lon === lon) // to search by city or (lat+lon)
-        );
-        if (!cityInfo) res.status(404).send('There is no data to show for this destination');
-        let forecastArr = cityInfo.data.map(info => new Forecast(info));
-        console.log(forecastArr);
+        if (!searchQuery) searchQuery = "doesn't match any city"
+        const URL = `https://api.weatherbit.io/v2.0//forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${lat}&lon=${lon}`
+        let axiosWeather = await axios.get(URL)
+        let forecastArr = axiosWeather.data.data.map(info => new Forecast(info));
+        // console.log(forecastArr);
         res.send(forecastArr);
     }
-    catch { }
-});
+    catch (e) {
+        res.status(e.status).send({ status: e.status, description: `Unable to Process Request.  Query String Correct? ${e.message}` });
+    }
+};
 
-// class Movie {
-//     constructor(movie) {
-//         this.title = movie.title
-//         this.overview = movie.overview
-//         this.vote_average = movie.vote_average
-//         this.vote_count = movie.vote_count
-//         this.poster_path = `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-//         this.popularity = movie.popularity
-//         this.release_date = movie.release_date
-//     }
-// }
+async function getMovies(req, res) {
+    let returnArr = [];
+    let { cityName } = req.query;
+    const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${cityName}`;
 
-// class Forecast {
-//     constructor (day) {
-//         this.datetime = day.datetime;
-//         this.description = day.weather.description
-//     }
-
-    
-// }
-
-server.get('/', (req,res)=>{
-    res.send('this is my main route')
-} )
-
-
-// http://localhost:3001/weather?lon=31.95&lat=35.91&city_name=Amman
-// http://localhost:3001/weather?
-server.get('/weather', getWeather)
-
-//     async function getWeather(req, res) {
-//     try{
-
-//         const lon = req.query.lon;
-//         const lat = req.query.lat;
-//         const city_name = req.query.city_name;
-    
-//         let getweather = weatherdata.find(i => i.city_name.toLowerCase() === city_name.toLowerCase() || (i.lat === lat && i.lon === lon) 
-//         )
-        
-//         if (!getweather) res.status(404).send('no data found');
-
-    
-//         let myweather = getweather.data.map(i => new Forecast(i));
-    
-//         res.send(myweather);
-//     }
-
-//     catch {}
-
-    
-    
-
-// }
-
-
-
-server.get('/movies', getMovies)
-
-// async function getMovies(req, res) {
-//     let returnArr = [];
-//     let { cityName } = req.query;
-//     const URL = `https://api.themoviedb.org/3/search/movie?api_key=mSjXydZRVkSuJXcfMURFNgfcSKMmSEANpAKgBdcJgvc&query=${cityName}`;
-
-//     try {
-//         let axiosMovies = await axios.get(URL)
-//         console.log(axiosMovies.data.results);
-//         axiosMovies.data.results.map(item => returnArr.push(new Movie(item)));
-//         res.status(200).send(returnArr);
-//     }
-//     catch (error) {
-//         res.status(400)
-//         if (error.status) res.status(error.status).send(error.message)
-//     }
-// }
+    try {
+        let axiosMovies = await axios.get(URL)
+        console.log(axiosMovies.data.results);
+        axiosMovies.data.results.map(item => returnArr.push(new Movie(item)));
+        res.status(200).send(returnArr);
+    }
+    catch (error) {
+        res.status(400)
+        if (error.status) res.status(error.status).send(error.message)
+    }
+}
+        this.description = day.weather.description;
+    }
+}
 
 server.listen(PORT, () => console.log(`listening on ${PORT}`));
